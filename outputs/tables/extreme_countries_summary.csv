@@ -1,0 +1,13 @@
+metric,extreme,country,value
+airports_total,highest,Italy,25.0
+airports_total,lowest,Estonia,1.0
+airports_per_100k_km2,highest,Malta,316.4556962025316
+airports_per_100k_km2,lowest,Slovakia,2.0392764647103205
+airports_per_million_people,highest,Cyprus,2.0795583572598075
+airports_per_million_people,lowest,Slovakia,0.18471269694760423
+routes_per_airport,highest,Belgium,267.0
+routes_per_airport,lowest,Romania,28.166666666666668
+local_density_mean,highest,France,1266.1890331837023
+local_density_mean,lowest,Sweden,105.85823922355354
+population_density_country,highest,Malta,1817.246835443038
+population_density_country,lowest,Finland,16.69446455215612
