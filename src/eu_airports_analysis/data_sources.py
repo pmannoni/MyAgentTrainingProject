@@ -31,6 +31,10 @@ def _download_bytes(url: str, timeout: int = 60) -> bytes:
 
 
 def load_airports(refresh: bool = False) -> pd.DataFrame:
+    return load_airports_for_types(AIRPORT_TYPES_FILTER, refresh=refresh)
+
+
+def load_airports_for_types(airport_types: tuple[str, ...], refresh: bool = False) -> pd.DataFrame:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     cache = RAW_DIR / "ourairports_airports.csv"
     if refresh or not cache.exists():
@@ -38,7 +42,7 @@ def load_airports(refresh: bool = False) -> pd.DataFrame:
     airports = pd.read_csv(cache)
     airports = airports[
         airports["iso_country"].isin(EU_COUNTRIES.keys())
-        & airports["type"].isin(AIRPORT_TYPES_FILTER)
+        & airports["type"].isin(airport_types)
     ].copy()
     airports = airports[["ident", "name", "type", "iso_country", "iata_code", "latitude_deg", "longitude_deg"]]
     airports.rename(

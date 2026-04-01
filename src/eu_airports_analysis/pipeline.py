@@ -11,6 +11,7 @@ from .analysis import (
 from .config import FIGURES_DIR, PROCESSED_DIR, REPORTS_DIR, TABLES_DIR
 from .data_sources import (
     load_airports,
+    load_airports_for_types,
     load_eu_cities,
     load_routes_activity,
     load_worldbank_country_stats,
@@ -24,6 +25,7 @@ from .policy_analysis import (
 )
 from .plotting import (
     plot_airports_map,
+    plot_airports_map_medium_large_polished,
     plot_country_comparisons,
     plot_country_metric_maps,
     plot_policy_relationships,
@@ -38,6 +40,7 @@ def run(refresh: bool = False) -> dict[str, Path]:
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
 
     airports = load_airports(refresh=refresh)
+    airports_medium_large = load_airports_for_types(("medium_airport", "large_airport"), refresh=refresh)
     routes = load_routes_activity(refresh=refresh)
     cities = load_eu_cities(refresh=refresh)
     country_stats = load_worldbank_country_stats(refresh=refresh)
@@ -58,6 +61,7 @@ def run(refresh: bool = False) -> dict[str, Path]:
     correlations_csv = TABLES_DIR / "policy_airport_correlations.csv"
     profiles_csv = TABLES_DIR / "policy_country_profiles.csv"
     map_html = FIGURES_DIR / "eu_airports_map.html"
+    polished_map_html = FIGURES_DIR / "eu_airports_map_medium_large_polished.html"
     publication_md = REPORTS_DIR / "publication_politique_ecologique_fr.md"
 
     airports.to_csv(airports_csv, index=False)
@@ -68,6 +72,7 @@ def run(refresh: bool = False) -> dict[str, Path]:
     policy_profiles.to_csv(profiles_csv, index=False)
 
     plot_airports_map(airports, map_html)
+    plot_airports_map_medium_large_polished(airports_medium_large, polished_map_html)
     plot_country_comparisons(country_metrics, airports, FIGURES_DIR)
     country_maps = plot_country_metric_maps(country_metrics, FIGURES_DIR)
     density_maps = plot_population_density_maps(airports, cities, country_metrics, FIGURES_DIR)
@@ -82,6 +87,7 @@ def run(refresh: bool = False) -> dict[str, Path]:
         "policy_correlations": correlations_csv,
         "policy_profiles": profiles_csv,
         "map": map_html,
+        "map_medium_large_polished": polished_map_html,
         "publication": publication_md,
     }
     for idx, path in enumerate(country_maps, start=1):

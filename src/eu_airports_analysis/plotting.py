@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 from .config import COUNTRY_MAP_METRICS
 
@@ -241,4 +242,104 @@ def plot_policy_relationships(
         "policy_vs_routes_per_airport": policy_routes,
         "policy_airport_correlation_heatmap": heatmap,
     }
+
+
+def plot_airports_map_medium_large_polished(airports: pd.DataFrame, output_file: Path) -> None:
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    type_labels = {
+        "large_airport": "Grand aeroport",
+        "medium_airport": "Aeroport moyen",
+    }
+    colors = {
+        "large_airport": "#e63946",
+        "medium_airport": "#1d3557",
+    }
+    sizes = {
+        "large_airport": 10,
+        "medium_airport": 7,
+    }
+
+    fig = go.Figure()
+    for airport_type in ["large_airport", "medium_airport"]:
+        subset = airports[airports["type"] == airport_type]
+        if subset.empty:
+            continue
+        fig.add_trace(
+            go.Scattergeo(
+                lon=subset["lon"],
+                lat=subset["lat"],
+                text=subset["name"],
+                customdata=np.stack(
+                    [
+                        subset["country_name"].fillna(""),
+                        subset["iata_code"].fillna(""),
+                        subset["type"].map(type_labels).fillna(subset["type"]),
+                    ],
+                    axis=-1,
+                ),
+                hovertemplate=(
+                    "<b>%{text}</b><br>"
+                    "Pays: %{customdata[0]}<br>"
+                    "Type: %{customdata[2]}<br>"
+                    "IATA: %{customdata[1]}<extra></extra>"
+                ),
+                mode="markers",
+                marker={
+                    "size": sizes[airport_type],
+                    "color": colors[airport_type],
+                    "line": {"color": "white", "width": 0.8},
+                    "opacity": 0.82,
+                },
+                name=type_labels[airport_type],
+            )
+        )
+
+    fig.update_geos(
+        scope="europe",
+        projection_type="natural earth",
+        showcoastlines=True,
+        coastlinecolor="#6c757d",
+        showcountries=True,
+        countrycolor="#adb5bd",
+        showland=True,
+        landcolor="#f8f9fa",
+        showocean=True,
+        oceancolor="#edf2fb",
+        lataxis_range=[34, 72],
+        lonaxis_range=[-26, 45],
+    )
+    fig.update_layout(
+        title={
+            "text": "Aeroports moyens et grands en Europe (UE)",
+            "x": 0.5,
+            "xanchor": "center",
+            "font": {"size": 23},
+        },
+        template="plotly_white",
+        margin={"l": 10, "r": 10, "t": 70, "b": 10},
+        legend={
+            "title": {"text": "Type d'aeroport"},
+            "orientation": "h",
+            "x": 0.5,
+            "xanchor": "center",
+            "y": 0.02,
+            "yanchor": "bottom",
+            "bgcolor": "rgba(255,255,255,0.85)",
+            "bordercolor": "#dee2e6",
+            "borderwidth": 1,
+        },
+        annotations=[
+            {
+                "text": "Source: OurAirports | Filtre: medium_airport + large_airport",
+                "xref": "paper",
+                "yref": "paper",
+                "x": 0.99,
+                "y": 0.0,
+                "showarrow": False,
+                "font": {"size": 11, "color": "#6c757d"},
+            }
+        ],
+    )
+    fig.write_html(str(output_file), include_plotlyjs="cdn")
+
 

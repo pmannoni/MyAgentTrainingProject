@@ -24,6 +24,7 @@ After running, files are generated in:
 - `outputs/tables/country_metrics.csv`
 - `outputs/tables/extreme_countries_summary.csv`
 - `outputs/figures/eu_airports_map.html`
+- `outputs/figures/eu_airports_map_medium_large_polished.html`
 - `outputs/figures/airports_vs_surface.png`
 - `outputs/figures/airports_vs_population.png`
 - `outputs/figures/activity_proxy_by_country.png`
