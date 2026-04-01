@@ -1,0 +1,16 @@
+airport_metric,policy_metric,spearman_rho,n,abs_spearman_rho
+local_density_mean,ecological_policy_index,-0.5128205128205128,27,0.5128205128205128
+local_density_mean,renewable_energy_pct,-0.4963369963369963,27,0.4963369963369963
+routes_per_airport,renewable_energy_pct,-0.475652577668114,27,0.475652577668114
+airports_per_million_people,renewable_energy_pct,0.47191697191697196,27,0.47191697191697196
+routes_per_airport,ecological_policy_index,-0.39902305456497106,27,0.39902305456497106
+airports_per_100k_km2,renewable_energy_pct,-0.3418803418803419,27,0.3418803418803419
+airports_per_million_people,ecological_policy_index,0.2771672771672771,27,0.2771672771672771
+airports_per_100k_km2,protected_areas_pct,0.1514041514041514,27,0.1514041514041514
+airports_per_million_people,protected_areas_pct,-0.1452991452991453,27,0.1452991452991453
+airports_per_100k_km2,ecological_policy_index,-0.14407814407814404,27,0.14407814407814404
+airports_total,protected_areas_pct,-0.09221059601864826,27,0.09221059601864826
+airports_total,renewable_energy_pct,0.08760006621771585,27,0.08760006621771585
+local_density_mean,protected_areas_pct,-0.04212454212454213,27,0.04212454212454213
+routes_per_airport,protected_areas_pct,-0.03205617500330678,27,0.03205617500330678
+airports_total,ecological_policy_index,-0.014753695362983722,27,0.014753695362983722
