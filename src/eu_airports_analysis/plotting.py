@@ -186,3 +186,59 @@ def plot_population_density_maps(
         "airport_local_density": airport_density_file,
         "country_population_density": country_density_file,
     }
+
+
+def plot_policy_relationships(
+    merged_metrics: pd.DataFrame,
+    correlations: pd.DataFrame,
+    output_dir: Path,
+) -> dict[str, Path]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.scatter(merged_metrics["ecological_policy_index"], merged_metrics["airport_intensity_index"])
+    for row in merged_metrics.itertuples(index=False):
+        ax.annotate(row.country_iso2, (row.ecological_policy_index, row.airport_intensity_index), fontsize=8)
+    ax.set_xlabel("Ecological policy index (proxy)")
+    ax.set_ylabel("Airport intensity index")
+    ax.set_title("Ecological policy orientation vs airport intensity")
+    fig.tight_layout()
+    policy_intensity = output_dir / "policy_vs_airport_intensity.png"
+    fig.savefig(policy_intensity, dpi=180)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(9, 6))
+    ax.scatter(merged_metrics["ecological_policy_index"], merged_metrics["routes_per_airport"])
+    for row in merged_metrics.itertuples(index=False):
+        ax.annotate(row.country_iso2, (row.ecological_policy_index, row.routes_per_airport), fontsize=8)
+    ax.set_xlabel("Ecological policy index (proxy)")
+    ax.set_ylabel("Route connections per airport")
+    ax.set_title("Ecological policy orientation vs airport activity proxy")
+    fig.tight_layout()
+    policy_routes = output_dir / "policy_vs_routes_per_airport.png"
+    fig.savefig(policy_routes, dpi=180)
+    plt.close(fig)
+
+    pivot = correlations.pivot(index="airport_metric", columns="policy_metric", values="spearman_rho")
+    fig, ax = plt.subplots(figsize=(9, 5))
+    im = ax.imshow(pivot.to_numpy(dtype=float), cmap="coolwarm", vmin=-1, vmax=1)
+    ax.set_xticks(range(len(pivot.columns)), labels=pivot.columns, rotation=30, ha="right")
+    ax.set_yticks(range(len(pivot.index)), labels=pivot.index)
+    ax.set_title("Spearman correlations: airport metrics vs ecological policy proxies")
+    for i in range(len(pivot.index)):
+        for j in range(len(pivot.columns)):
+            value = pivot.iloc[i, j]
+            if pd.notna(value):
+                ax.text(j, i, f"{value:.2f}", ha="center", va="center", color="black", fontsize=8)
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    fig.tight_layout()
+    heatmap = output_dir / "policy_airport_correlation_heatmap.png"
+    fig.savefig(heatmap, dpi=180)
+    plt.close(fig)
+
+    return {
+        "policy_vs_airport_intensity": policy_intensity,
+        "policy_vs_routes_per_airport": policy_routes,
+        "policy_airport_correlation_heatmap": heatmap,
+    }
+

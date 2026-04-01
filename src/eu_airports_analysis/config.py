@@ -42,6 +42,7 @@ PROCESSED_DIR = DATA_DIR / "processed"
 OUTPUT_DIR = Path("outputs")
 FIGURES_DIR = OUTPUT_DIR / "figures"
 TABLES_DIR = OUTPUT_DIR / "tables"
+REPORTS_DIR = Path("reports")
 
 POP_RADIUS_KM = 25.0
 AIRPORT_TYPES_FILTER = ("large_airport",)
