@@ -1,0 +1,64 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from .analysis import (
+    attach_airport_activity,
+    build_country_metrics,
+    build_extremes_summary,
+    compute_local_population_density_proxy,
+)
+from .config import FIGURES_DIR, PROCESSED_DIR, TABLES_DIR
+from .data_sources import (
+    load_airports,
+    load_eu_cities,
+    load_routes_activity,
+    load_worldbank_country_stats,
+)
+from .plotting import (
+    plot_airports_map,
+    plot_country_comparisons,
+    plot_country_metric_maps,
+    plot_population_density_maps,
+)
+
+
+def run(refresh: bool = False) -> dict[str, Path]:
+    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    TABLES_DIR.mkdir(parents=True, exist_ok=True)
+
+    airports = load_airports(refresh=refresh)
+    routes = load_routes_activity(refresh=refresh)
+    cities = load_eu_cities(refresh=refresh)
+    country_stats = load_worldbank_country_stats(refresh=refresh)
+
+    airports = attach_airport_activity(airports, routes)
+    airports = compute_local_population_density_proxy(airports, cities)
+    country_metrics = build_country_metrics(airports, country_stats)
+    extremes = build_extremes_summary(country_metrics)
+
+    airports_csv = PROCESSED_DIR / "airports_enriched.csv"
+    country_csv = TABLES_DIR / "country_metrics.csv"
+    extremes_csv = TABLES_DIR / "extreme_countries_summary.csv"
+    map_html = FIGURES_DIR / "eu_airports_map.html"
+
+    airports.to_csv(airports_csv, index=False)
+    country_metrics.to_csv(country_csv, index=False)
+    extremes.to_csv(extremes_csv, index=False)
+
+    plot_airports_map(airports, map_html)
+    plot_country_comparisons(country_metrics, airports, FIGURES_DIR)
+    country_maps = plot_country_metric_maps(country_metrics, FIGURES_DIR)
+    density_maps = plot_population_density_maps(airports, cities, country_metrics, FIGURES_DIR)
+
+    outputs = {
+        "airports": airports_csv,
+        "country_metrics": country_csv,
+        "extremes": extremes_csv,
+        "map": map_html,
+    }
+    for idx, path in enumerate(country_maps, start=1):
+        outputs[f"country_map_{idx}"] = path
+    outputs.update(density_maps)
+    return outputs
